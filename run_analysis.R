@@ -10,14 +10,16 @@ label_train <- read.table("train/y_train.txt");
 activityTable <- read.table("activity_labels.txt")
 act <- activityTable[, 2];
 
-data_test <- read.table("test/X_test.txt");
-names(data_test) <- feature;
+data_test <- read.table("test/X_test.txt", row.names=NULL);
+names(data_test) <- feature[, 2];
 selectedDataTest <- data_test[, grepl("std\\(\\)", names(data_test)) | grepl("mean\\(\\)", names(data_test))];
 selectedDataTest$dActivity <- act[label_test[, 1]];
+selectedDataTest$subject <- subject_test;
 
-data_train <- read.table("train/X_train.txt")
-names(data_train) <- feature;
+data_train <- read.table("train/X_train.txt", row.names=NULL)
+names(data_train) <- feature[, 2];
 selectedDataTrain <- data_train[, grepl("std\\(\\)", names(data_train)) | grepl("mean\\(\\)", names(data_train))];
 selectedDataTrain$dActivity <- act[label_train[, 1]];
+selectedDataTrain$subject <- subject_train;
 
 mergedData <- merge(selectedDataTrain, selectedDataTest, all=TRUE);
