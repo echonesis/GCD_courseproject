@@ -30,7 +30,7 @@ For overall tidy data, we could observe the stats:
 	
 - subject: This variable would reflect target subject who performed the activityIts ranging from 1 to 30. 
 - activity: Links the class labels with their activity name, whose class is character.
-- measurements: total 66 types of measurements, which are summarized as follows.  For all the derived variables, t means time-series detected values, which could be separated into X-, Y- and Z-axis.  Functions of `mean()` and `std()` mean the arithmetic mean and standard deviation.
+- measurements: total 66 types of measurements, which are summarized as follows.  For all the derived variables, t means time-series detected values, which could be separated into X-, Y- and Z-axis.  Besides, f means frequency-series of the detected data, which is the result of doing FFT on the time-series data.  Functions of `mean()` and `std()` mean the arithmetic mean and standard deviation.
 
 ### BodyAcc
 Body Acceleration
