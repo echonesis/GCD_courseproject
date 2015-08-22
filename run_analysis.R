@@ -1,25 +1,45 @@
 # run_analysis.R
-# Main R-script for doing Data Manipulation
 
-# Step 1
+# import library
+library(reshape2);
+
+# Clear Workspace
+rm(list=ls());
+
+# read.in usable datasets
+# including data, subject, label,
+#           feature, activity
+data_test <- read.table("test/X_test.txt");
+data_train <- read.table("train/X_train.txt")
 subject_test <- read.table("test/subject_test.txt");
 subject_train <- read.table("train/subject_train.txt");
 feature <- read.table("features.txt");
 label_test <- read.table("test/y_test.txt");
 label_train <- read.table("train/y_train.txt");
 activityTable <- read.table("activity_labels.txt")
-act <- activityTable[, 2];
+act <- as.vector(activityTable[, 2]);
 
-data_test <- read.table("test/X_test.txt", row.names=NULL);
-names(data_test) <- feature[, 2];
-selectedDataTest <- data_test[, grepl("std\\(\\)", names(data_test)) | grepl("mean\\(\\)", names(data_test))];
-selectedDataTest$dActivity <- act[label_test[, 1]];
-selectedDataTest$subject <- subject_test;
+combinedData <- rbind(data_test, data_train);
+combinedSubject <- rbind(subject_test, subject_train);
+combinedActivity <- act[rbind(as.matrix(label_test), as.matrix(label_train))];
 
-data_train <- read.table("train/X_train.txt", row.names=NULL)
-names(data_train) <- feature[, 2];
-selectedDataTrain <- data_train[, grepl("std\\(\\)", names(data_train)) | grepl("mean\\(\\)", names(data_train))];
-selectedDataTrain$dActivity <- act[label_train[, 1]];
-selectedDataTrain$subject <- subject_train;
+# Step2: Extract Features with mean() and std()
+idxList <- grepl("std\\(\\)", feature[, 2]) | grepl("mean\\(\\)", feature[,2]);
+selectedData <- combinedData[, idxList]
+selectedFeature <- c(as.vector(feature[idxList, 2]))
 
-mergedData <- merge(selectedDataTrain, selectedDataTest, all=TRUE);
+# Step3: Descriptive activity
+#
+# Step4: Appropriately labels the data set with 
+#        descriptive variable names
+colnames(selectedData) <- selectedFeature
+selectedData$subject <- combinedSubject[, 1]
+selectedData$activity <- combinedActivity
+
+# Step5: 
+dataMelt <- melt(selectedData, id=c("subject", "activity"), 
+                 measure.vars = selectedFeature)
+tidyData <- dcast(dataMelt, subject + activity ~ variable, mean)
+
+# Output Data by write.table
+write.table(tidyData, file="./output_tidyData.txt", row.names = FALSE)
